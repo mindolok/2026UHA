@@ -726,13 +726,17 @@ class Planner:
             out["d_minutes_vs_event"] = round(cand.minutes) - orig_check["minutes_with_events"]
         return out
 
+    # search effort: (baseline runs, strict runs, relaxed runs). "fast" for weak servers.
+    EFFORT = {"full": (4, 8, 3), "fast": (2, 5, 1)}
+
     def search(self, olat, olng, dlat, dlng, depart_min: float, top_k: int = 5,
-               subway: bool = True) -> dict:
+               subway: bool = True, effort: str = "full") -> dict:
+        nb, ns, nr = self.EFFORT.get(effort, self.EFFORT["full"])
         a = self.net.a
         o, d = (olat, olng), (dlat, dlng)
         self._ban0 = frozenset() if subway else frozenset(r for r, k in self.net.kind.items() if k == "subway")
         # 1) original routes (events ignored) and T0* = fastest original, fixed
-        base = sorted(self._diverse(o, d, depart_min, "baseline", None, max_runs=4),
+        base = sorted(self._diverse(o, d, depart_min, "baseline", None, max_runs=nb),
                       key=lambda p: (p.minutes, p.transfers, p.walk_m))
         if not base:
             return {"t0_min": None, "confirmed": [], "needs_check": [], "original": [],
@@ -749,10 +753,10 @@ class Planner:
         # 3) event-aware candidates (branches are inside the search: walk to the
         #    same route's neighbour stop, ride on past a skipped stop, other routes)
         keep = lambda p: p.minutes <= limit and p.transfers <= a.max_transfers
-        strict = [p for p in self._diverse(o, d, depart_min, "strict", budget, 8, limit) if keep(p)]
+        strict = [p for p in self._diverse(o, d, depart_min, "strict", budget, ns, limit) if keep(p)]
         confirmed = [p for p in strict if not p.needs_check]
         fastest_ok = min((p.minutes for p in confirmed), default=math.inf)
-        relaxed = self._diverse(o, d, depart_min, "relaxed", budget, 3, limit)
+        relaxed = self._diverse(o, d, depart_min, "relaxed", budget, nr, limit)
         needs = [p for p in relaxed if keep(p) and p.needs_check and p.minutes < fastest_ok]
         # 4) Pareto ranking (front number, then time)
         def pack(ps, k):

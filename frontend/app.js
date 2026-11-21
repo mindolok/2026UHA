@@ -10,7 +10,7 @@ const S = {
 };
 
 // ---------------------------------------------------------------- helpers
-async function api(url, opts = {}, timeoutMs = 30000) {
+async function api(url, opts = {}, timeoutMs = 90000) {
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), timeoutMs);
   try {
@@ -20,7 +20,7 @@ async function api(url, opts = {}, timeoutMs = 30000) {
     if (!r.ok) throw new Error((data && data.detail) || text || `HTTP ${r.status}`);
     return data;
   } catch (e) {
-    if (e.name === "AbortError") throw new Error("서버 응답이 없습니다(30초). 서버 터미널에 오류가 있는지 확인하고 서버를 다시 켜 주세요.");
+    if (e.name === "AbortError") throw new Error("서버 응답이 없습니다(90초). 서버가 잠에서 깨어나는 중일 수 있어요. 잠시 뒤 다시 눌러 주세요.");
     if (e instanceof TypeError) throw new Error("서버에 연결할 수 없습니다. uvicorn 서버가 켜져 있는지 확인하세요.");
     throw e;
   } finally { clearTimeout(timer); }
@@ -195,7 +195,7 @@ async function searchRoute() {
   if (!S.point.origin || !S.point.dest) { status("err", "출발지와 도착지를 정해 주세요. (검색하거나 지도를 우클릭)"); return; }
   S.searching = true; $("btnRoute").disabled = true;
   $("results").innerHTML = ""; clear(S.drawn); setFocus(null);
-  status("loading", "통제 정보를 반영해 경로를 찾는 중…");
+  status("loading", "통제 정보를 반영해 경로를 찾는 중… (처음 요청은 최대 1분 걸릴 수 있어요)");
   try {
     const res = await api("/api/route", {
       method: "POST", headers: { "Content-Type": "application/json" },
