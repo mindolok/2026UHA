@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>여기타 · 통제 반영 길찾기</title>
+  <link rel="stylesheet" href="/static/style.css?v=7" />
+</head>
+<body>
+  <aside id="side">
+    <header>
+      <div class="logo">여기타<span>CITY FLOW</span></div>
+      <div class="event" id="event">교통통제 정보 불러오는 중…</div>
+    </header>
+
+    <nav class="tabs">
+      <button id="tabRoute" class="on">길찾기</button>
+      <button id="tabBus">내 버스</button>
+    </nav>
+
+    <section id="paneRoute">
+      <div class="od">
+        <div class="od-rows">
+          <div class="od-row">
+            <i class="od-dot start"></i>
+            <input id="inOrigin" placeholder="출발지 입력" autocomplete="off" />
+            <button class="ico" id="mapOrigin" title="지도에서 선택">◎</button>
+            <ul class="ac" id="acOrigin"></ul>
+          </div>
+          <div class="od-row">
+            <i class="od-dot end"></i>
+            <input id="inDest" placeholder="도착지 입력" autocomplete="off" />
+            <button class="ico" id="mapDest" title="지도에서 선택">◎</button>
+            <ul class="ac" id="acDest"></ul>
+          </div>
+        </div>
+        <button class="swap" id="swap" title="출발/도착 바꾸기">⇅</button>
+      </div>
+      <div class="when">
+        <label>출발 <input id="time" type="time" value="08:30" /></label>
+        <label class="mode"><input type="checkbox" id="useSubway" checked /> 🚇 지하철 포함</label>
+        <button class="go" id="btnRoute">길찾기</button>
+      </div>
+      <div class="ex"><span>시연 예시</span>
+        <button data-i="0">여의도→경복궁 08:00</button><button data-i="1">세종문화회관→건대 10:00</button><button data-i="2">신당→양재 09:00</button>
+      </div>
+      <p class="hint" id="hint">지도를 <b>마우스 오른쪽 클릭</b>해도 출발·도착을 정할 수 있어요.</p>
+    </section>
+
+    <section id="paneBus" hidden>
+      <div class="field"><input id="busNo" placeholder="버스 번호 (예: 701)" /></div>
+      <div class="field"><input id="arsNo" placeholder="정류소 번호 5자리 (예: 02124)" inputmode="numeric" /></div>
+      <div class="when">
+        <label>시각 <input id="time2" type="time" value="08:30" /></label>
+        <button class="go" id="btnStop">정차 확인</button>
+      </div>
+      <p class="hint">정류소 번호는 정류장 표지판 위쪽 5자리 숫자예요.</p>
+    </section>
+
+    <div id="status"></div>
+    <div id="results"></div>
+  </aside>
+
+  <main id="mapwrap">
+    <div id="map"></div>
+    <div class="mapbtns">
+      <button id="toggleCtrl">교통통제 전체 보기</button>
+    </div>
+    <div class="legend" id="legend" hidden>
+      <span><i style="background:#e53935"></i>무정차</span>
+      <span><i style="background:#fb8c00"></i>확인 필요</span>
+      <span><b class="line"></b>통제 구간</span>
+    </div>
+  </main>
+  <script src="/static/app.js?v=7"></script>
+</body>
+</html>

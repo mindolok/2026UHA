@@ -1,0 +1,18 @@
+# Render 배포 설정 (Blueprint). 저장소를 Render에 연결하면 이 파일을 읽습니다.
+services:
+  - type: web
+    name: yeogita
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/config
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: KAKAO_JS_KEY        # Render 화면에서 직접 입력 (저장소에 넣지 않음)
+        sync: false
+      - key: KAKAO_REST_KEY
+        sync: false
+      - key: CORS_ORIGINS        # 화면을 다른 주소(예: Vercel)에서 띄울 때만. 쉼표로 구분
+        sync: false
